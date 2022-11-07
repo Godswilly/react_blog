@@ -9,6 +9,7 @@ import { Route, Routes, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import api from './api/posts';
+import useAxiosFetch from './hooks/useAxiosFetch';
 
 function App() {
 	const [posts, setPosts] = useState([]);
@@ -20,25 +21,13 @@ function App() {
 	const [editBody, setEditBody] = useState('');
 	const navigate = useNavigate();
 
-	useEffect(() => {
-		const fetchPosts = async () => {
-			try {
-				const response = await api.get('/posts');
-				setPosts(response.data);
-			} catch (err) {
-				if (err.response) {
-					// Not in the 200 response range
-					console.log(err.response.data);
-					console.log(err.response.status);
-					console.log(err.response.headers);
-				} else {
-					console.log(`Error: ${err.message}`);
-				}
-			}
-		};
+	const { data, fetchError, isLoading } = useAxiosFetch(
+		'http://localhost:3500/posts'
+	);
 
-		fetchPosts();
-	}, []);
+	useEffect(() => {
+		setPosts(data);
+	}, [data]);
 
 	useEffect(() => {
 		const filteredResults = posts.filter(
@@ -100,7 +89,16 @@ function App() {
 				path='/'
 				element={<Layout search={search} setSearch={setSearch} />}
 			>
-				<Route index element={<Home posts={searchResults} />} />
+				<Route
+					index
+					element={
+						<Home
+							posts={searchResults}
+							fetchError={fetchError}
+							isLoading={isLoading}
+						/>
+					}
+				/>
 
 				<Route path='post'>
 					<Route
