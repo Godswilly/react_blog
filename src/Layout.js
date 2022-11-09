@@ -3,15 +3,16 @@ import Header from './Header';
 import Nav from './Nav';
 import Footer from './Footer';
 import { Outlet } from 'react-router';
-import useWindowSize from './hooks/useWindowSize';
+import { DataProvider } from './context/DataContext';
 
-const Layout = ({ search, setSearch }) => {
-	const { width } = useWindowSize();
+const Layout = () => {
 	return (
 		<div className='App'>
-			<Header title='React JS Blog' width={width} />
-			<Nav search={search} setSearch={setSearch} />
-			<Outlet />
+			<Header title='React JS Blog' />
+			<DataProvider>
+				<Nav />
+				<Outlet />
+			</DataProvider>
 			<Footer />
 		</div>
 	);
